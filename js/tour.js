@@ -338,6 +338,7 @@ const photoIndicator = document.getElementById('photoIndicator');
 const zoomInBtn = document.getElementById('zoomIn');
 const zoomOutBtn = document.getElementById('zoomOut');
 const zoomResetBtn = document.getElementById('zoomReset');
+const copyAddressBtn = document.getElementById('copyAddressBtn');
 
 // 이미지 프리로드 함수
 function preloadImage(src) {
@@ -418,6 +419,9 @@ function setupEventListeners() {
     zoomInBtn.addEventListener('click', () => zoom(0.2));
     zoomOutBtn.addEventListener('click', () => zoom(-0.2));
     zoomResetBtn.addEventListener('click', () => resetZoom());
+
+    // 주소 복사 버튼
+    copyAddressBtn.addEventListener('click', copyAddress);
 
     // 이미지 드래그 (줌 상태일 때)
     let isDragging = false;
@@ -676,6 +680,58 @@ function resetZoom() {
     zoomLevel = 1;
     mainImage.style.transform = 'scale(1)';
     mainImage.style.cursor = 'default';
+}
+
+// 주소 복사 함수
+function copyAddress() {
+    const address = '인천시 강화군 내가면 고비고개로743번길 47-8 (고천리 1502-4)';
+
+    // Clipboard API 사용
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(address)
+            .then(() => {
+                showCopySuccess();
+            })
+            .catch(err => {
+                console.error('복사 실패:', err);
+                fallbackCopy(address);
+            });
+    } else {
+        // 구형 브라우저 대응
+        fallbackCopy(address);
+    }
+}
+
+// 대체 복사 방법 (구형 브라우저용)
+function fallbackCopy(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.select();
+
+    try {
+        document.execCommand('copy');
+        showCopySuccess();
+    } catch (err) {
+        console.error('복사 실패:', err);
+        alert('주소 복사에 실패했습니다.');
+    }
+
+    document.body.removeChild(textArea);
+}
+
+// 복사 성공 표시
+function showCopySuccess() {
+    copyAddressBtn.classList.add('copied');
+    const originalText = copyAddressBtn.textContent;
+    copyAddressBtn.textContent = '✓';
+
+    setTimeout(() => {
+        copyAddressBtn.classList.remove('copied');
+        copyAddressBtn.textContent = originalText;
+    }, 2000);
 }
 
 // 페이지 로드 시 초기화
