@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>금은별장 가상 투어</title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 로딩 화면 -->
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>로딩 중...</p>
+    </div>
+
+    <!-- 헤더 -->
+    <header>
+        <div class="header-content">
+            <div class="header-subtitle"> 서강대학교 가상융합전문대학원 워크샵</div>
+            <h1>🏡 금은별장</h1>
+        </div>
+        <button id="menuBtn" class="menu-btn">☰</button>
+    </header>
+
+    <!-- 사이드 메뉴 -->
+    <nav id="sideMenu" class="side-menu">
+        <button class="close-btn" id="closeMenuBtn">✕</button>
+        <h2>공간 선택</h2>
+        <ul id="locationList">
+            <li class="menu-category">진입 구역</li>
+            <li><button class="location-btn" data-location="entrance-road">🛣️ 진입로</button></li>
+            <li><button class="location-btn" data-location="resort-entrance-1">🌳 금은별장 진입로1</button></li>
+            <li><button class="location-btn" data-location="resort-entrance-2">🌲 금은별장 진입로2</button></li>
+            <li><button class="location-btn" data-location="resort-entrance-3">🌴 금은별장 진입로3</button></li>
+
+            <li class="menu-category">주차 구역</li>
+            <li><button class="location-btn" data-location="parking-road-1">🛤️ 주차장길1</button></li>
+            <li><button class="location-btn" data-location="parking-1">🅿️ 제1 주차장</button></li>
+            <li><button class="location-btn" data-location="parking-road-2">🛤️ 주차장길2</button></li>
+            <li><button class="location-btn" data-location="parking-2">🅿️ 제2 주차장</button></li>
+
+            <li class="menu-category">외부 시설</li>
+            <li><button class="location-btn" data-location="resort-gate">🏠 금은별장 입구</button></li>
+            <li><button class="location-btn" data-location="smoking-area">🚬 흡연장</button></li>
+            <li><button class="location-btn" data-location="bbq-area">🍖 바베큐장</button></li>
+            <li><button class="location-btn" data-location="footvolley">⚽ 족구장</button></li>
+
+            <li class="menu-category">건물 입구</li>
+            <li><button class="location-btn" data-location="main-entrance">🚪 정문</button></li>
+            <li><button class="location-btn" data-location="bathroom-1">🚻 화장실1</button></li>
+            <li><button class="location-btn" data-location="bathroom-2">🚻 화장실2</button></li>
+
+            <li class="menu-category">1층 메인</li>
+            <li><button class="location-btn" data-location="living-room">🛋️ 거실</button></li>
+            <li><button class="location-btn" data-location="bathroom-3">🚿 화장실3</button></li>
+            <li><button class="location-btn" data-location="kitchen">🍳 주방</button></li>
+
+            <li class="menu-category">1층 객실</li>
+            <li><button class="location-btn" data-location="room-1">🛏️ 방1</button></li>
+            <li><button class="location-btn" data-location="room-2">🛏️ 방2</button></li>
+            <li><button class="location-btn" data-location="room-3">🛏️ 방3</button></li>
+            <li><button class="location-btn" data-location="room-4">🛏️ 방4</button></li>
+            <li><button class="location-btn" data-location="bathroom-4">🚿 화장실4</button></li>
+
+            <li class="menu-category">테라스 & 야외</li>
+            <li><button class="location-btn" data-location="terrace-1">🌿 테라스1</button></li>
+            <li><button class="location-btn" data-location="outdoor-kitchen">🍴 야외주방</button></li>
+            <li><button class="location-btn" data-location="terrace-2">🌿 테라스2</button></li>
+
+            <li class="menu-category">2층</li>
+            <li><button class="location-btn" data-location="stairs">🪜 계단</button></li>
+            <li><button class="location-btn" data-location="stairs-up">⬆️ 계단 올라가는길</button></li>
+            <li><button class="location-btn" data-location="room-5">🛏️ 방5</button></li>
+            <li><button class="location-btn" data-location="room-6">🛏️ 방6</button></li>
+        </ul>
+    </nav>
+
+    <!-- 이미지 뷰어 컨테이너 -->
+    <div id="viewer" class="image-viewer">
+        <img id="mainImage" src="" alt="가상 투어" class="main-image">
+
+        <!-- 이동 핫스팟 컨테이너 -->
+        <div id="hotspotsContainer" class="hotspots-container"></div>
+
+        <!-- 사진 네비게이션 (같은 공간 내 여러 사진) -->
+        <div class="photo-nav">
+            <button id="prevPhoto" class="nav-arrow prev-arrow" style="display: none;">‹</button>
+            <button id="nextPhoto" class="nav-arrow next-arrow" style="display: none;">›</button>
+            <div id="photoIndicator" class="photo-indicator"></div>
+        </div>
+
+        <!-- 줌 컨트롤 -->
+        <div class="zoom-controls">
+            <button id="zoomIn" class="zoom-btn">+</button>
+            <button id="zoomReset" class="zoom-btn">⊙</button>
+            <button id="zoomOut" class="zoom-btn">−</button>
+        </div>
+    </div>
+
+    <!-- 현재 위치 표시 -->
+    <div id="currentLocation" class="current-location">
+        <span id="locationName">입구</span>
+    </div>
+
+    <!-- 참여 안내 메시지 -->
+    <div class="participation-message">
+        ❤️ 많은 참여 부탁드립니다
+    </div>
+
+    <!-- 네비게이션 힌트 -->
+    <div id="navHint" class="nav-hint">
+        📍 버튼을 클릭하여 다른 공간으로 이동하세요<br>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="js/tour.js"></script>
+</body>
+</html>
