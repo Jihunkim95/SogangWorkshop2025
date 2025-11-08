@@ -734,7 +734,24 @@ function showCopySuccess() {
     }, 2000);
 }
 
+// URL 파라미터에서 사용자 이름 가져오기
+function getUserNameFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('for');
+}
+
+// 개인화된 메시지 표시
+function setPersonalizedMessage() {
+    const userName = getUserNameFromURL();
+    const messageEl = document.getElementById('participationMessage');
+
+    if (userName && messageEl) {
+        messageEl.innerHTML = `<strong>${userName}</strong> 원우님을 위한 숙소 가이드`;
+    }
+}
+
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', () => {
+    setPersonalizedMessage();
     init();
 });
