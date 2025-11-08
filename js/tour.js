@@ -321,6 +321,7 @@ const locations = {
 let currentLocation = 'entrance-road'; // 진입로에서 시작
 let currentPhotoIndex = 0;
 let zoomLevel = 1;
+let imageCache = {}; // 이미지 캐시
 
 // DOM 요소
 const loadingEl = document.getElementById('loading');
@@ -338,10 +339,44 @@ const zoomInBtn = document.getElementById('zoomIn');
 const zoomOutBtn = document.getElementById('zoomOut');
 const zoomResetBtn = document.getElementById('zoomReset');
 
+// 이미지 프리로드 함수
+function preloadImage(src) {
+    if (imageCache[src]) return Promise.resolve(imageCache[src]);
+
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            imageCache[src] = img;
+            resolve(img);
+        };
+        img.onerror = reject;
+        img.src = src;
+    });
+}
+
+// 연결된 위치의 이미지 프리로드
+function preloadConnectedImages(locationId) {
+    const location = locations[locationId];
+    if (!location) return;
+
+    // 현재 위치의 모든 핫스팟 타겟 이미지 프리로드
+    location.hotspots.forEach(hotspot => {
+        const targetLocation = locations[hotspot.target];
+        if (targetLocation && targetLocation.photos) {
+            targetLocation.photos.forEach(photoSrc => {
+                preloadImage(photoSrc);
+            });
+        }
+    });
+}
+
 // 초기화
 function init() {
     loadLocation(currentLocation);
     setupEventListeners();
+
+    // 연결된 이미지 프리로드
+    preloadConnectedImages(currentLocation);
 
     // 힌트는 5초 후 사라짐
     setTimeout(() => {
@@ -474,7 +509,16 @@ function loadLocation(locationId, photoIndex = 0) {
     currentLocation = locationId;
     currentPhotoIndex = photoIndex;
 
-    loadingEl.classList.remove('hidden');
+    const photoSrc = location.photos[currentPhotoIndex];
+
+    // 캐시된 이미지가 있으면 즉시 표시, 없으면 로딩 표시
+    if (imageCache[photoSrc]) {
+        mainImage.src = photoSrc;
+        loadingEl.classList.add('hidden');
+    } else {
+        loadingEl.classList.remove('hidden');
+        mainImage.src = photoSrc;
+    }
 
     locationNameEl.textContent = `${location.emoji} ${location.name}`;
 
@@ -485,8 +529,6 @@ function loadLocation(locationId, photoIndex = 0) {
         }
     });
 
-    mainImage.src = location.photos[currentPhotoIndex];
-
     createHotspots(location.hotspots);
 
     updatePhotoNavigation(location.photos.length);
@@ -494,6 +536,9 @@ function loadLocation(locationId, photoIndex = 0) {
     resetZoom();
 
     sideMenu.classList.remove('active');
+
+    // 다음 연결된 이미지들 프리로드
+    preloadConnectedImages(locationId);
 }
 
 // 위치 이동
@@ -510,9 +555,16 @@ function changePhoto(direction) {
     if (totalPhotos <= 1) return;
 
     currentPhotoIndex = (currentPhotoIndex + direction + totalPhotos) % totalPhotos;
+    const photoSrc = location.photos[currentPhotoIndex];
 
-    loadingEl.classList.remove('hidden');
-    mainImage.src = location.photos[currentPhotoIndex];
+    // 캐시된 이미지가 있으면 즉시 표시
+    if (imageCache[photoSrc]) {
+        mainImage.src = photoSrc;
+    } else {
+        loadingEl.classList.remove('hidden');
+        mainImage.src = photoSrc;
+    }
+
     updatePhotoIndicator();
 }
 
